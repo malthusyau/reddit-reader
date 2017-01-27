@@ -1,0 +1,63 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="bower_components/app-route/app-location.html">
+<link rel="import" href="bower_components/app-route/app-route.html">
+<link rel="import" href="bower_components/iron-icons/social-icons.html">
+<link rel="import" href="bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="bower_components/paper-tabs/paper-tab.html">
+
+<dom-module id="reddit-reader">
+  <template>
+  <style>
+  app-header {
+    background-color: #4285f4;
+    color: #fff;
+  }
+
+  app-drawer {
+    --app-drawer-content-container: {
+      background-color: #d6d6d6;
+    };
+  }
+
+  paper-menu {
+    background-color: #d6d6d6;
+  }
+  </style>
+  <app-location route="{{route}}" use-hash-as-path></app-location>
+  <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
+  <app-header-layout>
+    <app-header fixed>
+      <app-toolbar>
+        <div main-title>Reddit Reader App</div>
+        <paper-tabs selected="{{routeData.view}}" attr-for-selected="tab" fallback-selection="hot">
+          <paper-tab tab="hot">
+            <iron-icon icon="social:whatshot" item-icon></iron-icon>
+            Hot
+          </paper-tab>
+          <paper-tab tab="top">
+            <iron-icon icon="thumb-up" item-icon></iron-icon>
+            Top
+          </paper-tab>
+          <paper-tab tab="favorites">
+            <iron-icon icon="star" item-icon></iron-icon>
+            Favorites
+          </paper-tab>
+        </paper-tabs>
+      </app-toolbar>
+    </app-header>
+  </app-header-layout>
+</template>
+<script>
+Polymer({
+  is: 'reddit-reader',
+});
+</script>
+</dom-module>

@@ -27,6 +27,10 @@
     "paper-icon-button": "polymerelements/paper-icon-button#^1.0.0",
     "web-animations-js": "web-animations/web-animations-js#^2.2.1",
     "iron-input": "polymerelements/iron-input#^1.0.0",
-    "iron-autogrow-textarea": "polymerelements/iron-autogrow-textarea#^1.0.0"
+    "iron-autogrow-textarea": "polymerelements/iron-autogrow-textarea#^1.0.0",
+    "app-layout": "polymerelements/app-layout#^0.10.6",
+    "polymerfire": "firebase/polymerfire#^0.10.3",
+    "app-route": "polymerelements/app-route#^0.9.3",
+    "paper-tabs": "polymerelements/paper-tabs#^1.7.0"
   }
 }

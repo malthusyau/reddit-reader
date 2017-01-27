@@ -1,17 +1,33 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <link rel="manifest" href="manifest.json">
-    <title>Reddit</title>
-    <style>
-      body {
-        margin: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Hello World</h1>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <link rel="manifest" href="manifest.json">
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="bower_components/web-animations-js/web-animations.min.js"></script>
+  <link rel="import" href="bower_components/platinum-sw/platinum-sw-elements.html">
+  <link rel="import" href="bower_components/polymerfire/firebase-app.html">
+  <link rel="import" href="reddit-reader.html">
+  <title>Reddit</title>
+  <platinum-sw-register auto-register skip-waiting clients-claim reload-on-install href="sw-import.js">
+    <platinum-sw-cache default-cache-strategy="networkFirst"></platinum-sw-cache>
+  </platinum-sw-register>
+  <firebase-app
+    name="reddit-reader"
+    api-key="AIzaSyCOQtOGIsZl_DMf9hmDkHQEHX7dq8K3h1k"
+    auth-domain="reddit-reader-c2935.firebaseapp.com"
+    database-url="https://reddit-reader-c2935.firebaseio.com">
+  </firebase-app>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <reddit-reader></reddit-reader>
+</body>
 </html>
