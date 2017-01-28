@@ -15,6 +15,9 @@
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="rr-hot-page.html">
+<link rel="import" href="rr-top-page.html">
+<link rel="import" href="rr-favorites-page.html">
 <link rel="import" href="rr-login-page.html">
 
 <dom-module id="reddit-reader">
@@ -72,8 +75,17 @@
 
     <!-- main content -->
     <div class="fullbleed">
-      <template is="dom-if" if="[[isLoginPage(routeData.view)]]">
+      <template is="dom-if" if="[[isRightPage(routeData.view, 'login')]]">
         <rr-login-page on-sign-in="login"></rr-login-page>
+      </template>
+      <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
+        <rr-hot-page></rr-hot-page>
+      </template>
+      <template is="dom-if" if="[[isRightPage(routeData.view, 'top')]]">
+        <rr-top-page></rr-top-page>
+      </template>
+      <template is="dom-if" if="[[isRightPage(routeData.view, 'favorites')]]">
+        <rr-favorites-page></rr-favorites-page>
       </template>
     </div>
   </app-header-layout>
@@ -81,48 +93,67 @@
 <script>
 Polymer({
   is: 'reddit-reader',
+
+  properties: {
+    signedIn: {
+      type: Boolean,
+      observer: '_onSignedInChanged',
+    },
+  },
+
   observers: ['_onPathChange(route.path)'],
+
   _previousPage: null,
+
   _onPathChange(path) {
     if (!path) {
-      this.async(() => {
-        this.set('route.path', '/hot');
-      });
+      this.navigateTo('/hot');
     }
     if (path === '/favorites' && !this.signedIn) {
       this.goToLogin();
     }
   },
+
+  _onSignedInChanged(signedIn) {
+    if (signedIn) {
+      if (this.routeData.view === 'login') {
+        if (this._previousPage) {
+          this.navigateTo('/' + this._previousPage);
+          this._previousPage = null;
+        } else {
+          this.navigateTo('/hot');
+        }
+      }
+    } else {
+      this.navigateTo('/login');
+    }
+  },
+
   goToLogin() {
     if (this.routeData.view !== 'login') {
       this._previousPage = this.routeData.view;
-      this.async(() => {
-        this.set('route.path', '/login');
-      });
+      this.navigateTo('/login');
     }
   },
+
   login() {
-    const elem = this;
     this.$.auth.signInWithPopup().then(() => {
-      console.log(elem._previousPage);
-      if (elem._previousPage) {
-        elem.async(() => {
-          elem.set('route.path', '/' + elem._previousPage);
-        });
-      } else {
-        elem.async(() => {
-          elem.set('route.path', '/hot');
-        });
-      }
     });
   },
+
   signout() {
     this.$.auth.signOut().then(() => {
-      this.set('route.path', '/login');
     });
   },
-  isLoginPage(view) {
-    return view === 'login';
+
+  navigateTo(path) {
+    this.async(() => {
+      this.set('route.path', path);
+    });
+  },
+
+  isRightPage(view, name) {
+    return view === name;
   },
 });
 </script>
