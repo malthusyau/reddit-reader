@@ -1,0 +1,20 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<dom-module id="rr-login-page">
+  <template>
+  <style>
+  </style>
+  <paper-button on-tap="signIn" disabled="[[disabled]]">
+    <iron-icon icon="account-circle"></iron-icon>
+    <span>Sign in or create account</span>
+  </paper-button>
+</template>
+<script>
+Polymer({
+  is: 'rr-login-page',
+  signIn() {
+    this.fire('sign-in', null, { bubbles: false });
+  }
+});
+</script>
+</dom-module>
