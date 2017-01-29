@@ -1,0 +1,90 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/iron-image/iron-image.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="rr-post">
+  <template>
+  <style include="iron-flex">
+  paper-card {
+    display: block;
+    margin: 16px 0;
+    position: relative;
+  }
+
+  img {
+    height: 120px;
+  }
+
+  img:not([src^='http']) {
+    display: none;
+  }
+
+  .content {
+    margin: 10px 40px 10px 10px;
+  }
+
+  paper-card:hover .star {
+    display: block;
+  }
+
+  :host[saved] .star {
+    display: block;
+    color: #ffcb2c;
+  }
+
+  .star {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .source {
+    font-size: 12px;
+    color: #bbbbbb;
+  }
+  </style>
+  <paper-card>
+    <div class="layout horizontal">
+      <img src="[[getThumbnail(data.thumbnail)]]"></img>
+      <div class="flex content">
+        <span>[[decodeHtml(data.title)]]</span>
+        <span class="source">([[data.domain]])</span>
+        <br>
+        <a href$="https://reddit.com[[data.permalink]]" class="comments">[[data.num_comments]] comments</a>
+      </div>
+    </div>
+    <paper-icon-button class="star" icon="[[getStarIcon(saved)]]"></paper-icon-button>
+  </paper-card>
+</template>
+<script>
+Polymer({
+  is: 'rr-post',
+  properties: {
+    data: Object,
+    saved: {
+      type: Boolean,
+      reflectToAttribute: true,
+      value: false,
+    },
+  },
+  decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  },
+  getThumbnail(url) {
+    if (!!url && url.indexOf('http') === 0) {
+      return url;
+    }
+    return '';
+  },
+  getStarIcon(saved) {
+    return saved ? 'star' : 'star-border';
+  },
+});
+</script>
+</dom-module>

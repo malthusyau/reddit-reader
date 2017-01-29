@@ -21,7 +21,7 @@
     "iron-icons": "polymerelements/iron-icons#^1.0.0",
     "iron-icon": "polymerelements/iron-icon#^1.0.0",
     "font-roboto": "polymerelements/font-roboto#^1.0.0",
-    "iron-flex-layout": "polymerelements/iron-flex-layout#^1.0.0",
+    "iron-flex-layout": "polymerelements/iron-flex-layout#^1.3.1",
     "paper-button": "polymerelements/paper-button#^1.0.14",
     "paper-fab": "polymerelements/paper-fab#^1.0.0",
     "paper-icon-button": "polymerelements/paper-icon-button#^1.0.0",
@@ -31,6 +31,11 @@
     "app-layout": "polymerelements/app-layout#^0.10.6",
     "polymerfire": "firebase/polymerfire#^0.10.3",
     "app-route": "polymerelements/app-route#^0.9.3",
-    "paper-tabs": "polymerelements/paper-tabs#^1.7.0"
+    "paper-tabs": "polymerelements/paper-tabs#^1.7.0",
+    "iron-ajax": "polymerelements/iron-ajax#^1.4.3",
+    "paper-card": "polymerelements/paper-card#^1.1.4",
+    "paper-spinner": "polymerelements/paper-spinner#^1.2.1",
+    "iron-list": "polymerelements/iron-list#^1.4.0",
+    "iron-scroll-threshold": "polymerelements/iron-scroll-threshold#^1.0.3"
   }
 }

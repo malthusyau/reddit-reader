@@ -1,13 +1,79 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="bower_components/iron-scroll-threshold/iron-scroll-threshold.html">
+<link rel="import" href="bower_components/iron-image/iron-image.html">
+<link rel="import" href="bower_components/paper-styles/color.html">
+<link rel="import" href="bower_components/paper-styles/typography.html">
+<link rel="import" href="bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="bower_components/iron-list/iron-list.html">
+<link rel="import" href="rr-post.html">
 
 <dom-module id="rr-stream">
   <template>
   <style>
+  #scrollThreshold {
+    @apply(--fullbleed);
+  }
+
+  #loadMore {
+    text-align: center;
+  }
+
+  iron-list {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    --iron-list-items-container: {
+      max-width: 800px;
+      margin: auto;
+      margin-bottom: 10px;
+    };
+  }
   </style>
+
+  <iron-ajax id="ajax" url="[[url]]" params='{"limit": 25}' handle-as="json" on-response="onResponse"></iron-ajax>
+
+  <iron-scroll-threshold id="scrollThreshold" lower-threshold="500" on-lower-threshold="_loadMoreData">
+    <iron-list id="list" items="[[posts]]" scroll-target="scrollThreshold">
+      <template>
+        <rr-post data="[[item.data]]"></rr-post>
+      </template>
+    </iron-list>
+
+    <div id="loadMore">Load more</div>
+
+    <!-- this element will load more data when the user scrolls down and reached the lower threshold -->
+  </iron-scroll-threshold>
+
 </template>
+
 <script>
 Polymer({
-  is: 'rr-steam',
+  is: 'rr-stream',
+  properties: {
+    posts: {
+      type: Array,
+      value() {
+        return [];
+      },
+    },
+    nextPost: String,
+  },
+  _loadMoreData() {
+    this.$.ajax.params.count = this.posts.length;
+    this.$.ajax.params.after = this.nextPost;
+    this.$.ajax.generateRequest();
+  },
+  onResponse(event) {
+    var listings = event.detail.response.data.children;
+    this.nextPost = event.detail.response.data.after;
+    listings.forEach(post => {
+      this.push('posts', post);
+    });
+    // Clear the lower threshold so we can load more data when the user scrolls down again.
+    this.$.scrollThreshold.clearTriggers();
+  },
 });
 </script>
 </dom-module>

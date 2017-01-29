@@ -23,72 +23,61 @@
 <dom-module id="reddit-reader">
   <template>
   <style>
-  app-header {
+  app-toolbar {
     background-color: #4285f4;
     color: #fff;
-  }
-
-  app-drawer {
-    --app-drawer-content-container: {
-      background-color: #d6d6d6;
-    };
   }
 
   paper-menu {
     background-color: #d6d6d6;
   }
 
-  .fullbleed > * {
-    position: absolute;
-    top: 64px;
-    bottom: 0;
-    left: 0;
-    right: 0;
+  :host {
+    --fullbleed: {
+      position: absolute;
+      top: 64px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    };
   }
   </style>
   <app-location route="{{route}}" use-hash-as-path></app-location>
   <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
   <firebase-auth app-name="redditReader" id="auth" user="{{user}}" provider="google" signed-in="{{signedIn}}">
   </firebase-auth>
-  <app-header-layout fullbleed>
-    <app-header fixed>
-      <app-toolbar>
-        <div main-title>Reddit Reader App</div>
-        <paper-tabs selected="{{routeData.view}}" attr-for-selected="tab">
-          <paper-tab tab="hot">
-            <iron-icon icon="social:whatshot" item-icon></iron-icon>
-            Hot
-          </paper-tab>
-          <paper-tab tab="top">
-            <iron-icon icon="thumb-up" item-icon></iron-icon>
-            Top
-          </paper-tab>
-          <paper-tab tab="favorites">
-            <iron-icon icon="star" item-icon></iron-icon>
-            Favorites
-          </paper-tab>
-        </paper-tabs>
-        <paper-button raised hidden="[[!signedIn]]" on-tap="signout">logout</paper-button>
-        <paper-button raised hidden="[[signedIn]]" on-tap="goToLogin">login</paper-button>
-      </app-toolbar>
-    </app-header>
+  <app-toolbar>
+    <div main-title>Reddit Reader App</div>
+    <paper-tabs selected="{{routeData.view}}" attr-for-selected="tab">
+      <paper-tab tab="hot">
+        <iron-icon icon="social:whatshot" item-icon></iron-icon>
+        Hot
+      </paper-tab>
+      <paper-tab tab="top">
+        <iron-icon icon="thumb-up" item-icon></iron-icon>
+        Top
+      </paper-tab>
+      <paper-tab tab="favorites">
+        <iron-icon icon="star" item-icon></iron-icon>
+        Favorites
+      </paper-tab>
+    </paper-tabs>
+    <paper-button raised hidden="[[!signedIn]]" on-tap="signout">logout</paper-button>
+    <paper-button raised hidden="[[signedIn]]" on-tap="goToLogin">login</paper-button>
+  </app-toolbar>
 
-    <!-- main content -->
-    <div class="fullbleed">
-      <template is="dom-if" if="[[isRightPage(routeData.view, 'login')]]">
-        <rr-login-page on-sign-in="login"></rr-login-page>
-      </template>
-      <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
-        <rr-hot-page></rr-hot-page>
-      </template>
-      <template is="dom-if" if="[[isRightPage(routeData.view, 'top')]]">
-        <rr-top-page></rr-top-page>
-      </template>
-      <template is="dom-if" if="[[isRightPage(routeData.view, 'favorites')]]">
-        <rr-favorites-page></rr-favorites-page>
-      </template>
-    </div>
-  </app-header-layout>
+  <template is="dom-if" if="[[isRightPage(routeData.view, 'login')]]">
+    <rr-login-page on-sign-in="login"></rr-login-page>
+  </template>
+  <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
+    <rr-hot-page></rr-hot-page>
+  </template>
+  <template is="dom-if" if="[[isRightPage(routeData.view, 'top')]]">
+    <rr-top-page></rr-top-page>
+  </template>
+  <template is="dom-if" if="[[isRightPage(routeData.view, 'favorites')]]">
+    <rr-favorites-page></rr-favorites-page>
+  </template>
 </template>
 <script>
 Polymer({

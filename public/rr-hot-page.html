@@ -1,13 +1,11 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
-<link rel="import" href="rr-steam.html">
+<link rel="import" href="rr-stream.html">
 
 <dom-module id="rr-hot-page">
   <template>
   <style>
-  :host {
-    background-color: blue;    
-  }
   </style>
+  <rr-stream url="https://www.reddit.com/hot.json"></rr-stream>
 </template>
 <script>
 Polymer({
