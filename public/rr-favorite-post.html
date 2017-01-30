@@ -1,0 +1,26 @@
+
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="rr-post.html">
+
+<dom-module id="rr-favorite-post">
+  <template>
+  <style>
+  </style>
+  <iron-ajax url="[[getPostUrl(postId)]]">
+  </iron-ajax>
+  <iron-ajax id="ajax" url="[[getPostUrl(postId)]]" handle-as="json" last-response="{{ajaxResponse}}" auto></iron-ajax>
+  <rr-post data="[[ajaxResponse.data.children.0.data]]"></rr-post>
+</template>
+<script>
+Polymer({
+  is: 'rr-favorite-post',
+  properties: {
+    postId: String,
+  },
+  getPostUrl(postId) {
+    return `https://www.reddit.com/by_id/${postId}.json`;
+  },
+});
+</script>
+</dom-module>

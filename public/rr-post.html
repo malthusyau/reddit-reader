@@ -8,6 +8,10 @@
 <dom-module id="rr-post">
   <template>
   <style include="iron-flex">
+  :host[previewable] paper-card {
+    cursor: pointer;
+  }
+
   paper-card {
     display: block;
     margin: 16px 0;
@@ -46,23 +50,33 @@
     font-size: 12px;
     color: #bbbbbb;
   }
+
+  .title {
+    color: #2b2b2b;
+    text-decoration: none;
+  }
+
+  .title:visited {
+    color: #6b47ad;
+  }
   </style>
-  <paper-card>
+  <paper-card on-tap="openPreview">
     <div class="layout horizontal">
       <img src="[[getThumbnail(data.thumbnail)]]"></img>
       <div class="flex content">
-        <span>[[decodeHtml(data.title)]]</span>
+        <a href$="[[decodeHtml(data.url)]]" class="title" target="_blank" onclick="event.stopPropagation();">[[decodeHtml(data.title)]]</a>
         <span class="source">([[data.domain]])</span>
         <br>
-        <a href$="https://reddit.com[[data.permalink]]" class="comments">[[data.num_comments]] comments</a>
+        <a href$="https://reddit.com[[data.permalink]]" class="comments" onclick="event.stopPropagation();">[[data.num_comments]] comments</a>
       </div>
     </div>
-    <paper-icon-button class="star" icon="[[getStarIcon(saved)]]"></paper-icon-button>
+    <paper-icon-button class="star" icon="[[getStarIcon(saved)]]" on-tap="toggleFavorite"></paper-icon-button>
   </paper-card>
 </template>
 <script>
 Polymer({
   is: 'rr-post',
+
   properties: {
     data: Object,
     saved: {
@@ -70,20 +84,47 @@ Polymer({
       reflectToAttribute: true,
       value: false,
     },
+    previewable: {
+      type: Boolean,
+      reflectToAttribute: true,
+      computed: 'hasPreview(data)',
+    },
   },
+
   decodeHtml(html) {
     var txt = document.createElement("textarea");
     txt.innerHTML = html;
     return txt.value;
   },
+
   getThumbnail(url) {
     if (!!url && url.indexOf('http') === 0) {
       return url;
     }
     return '';
   },
+
   getStarIcon(saved) {
     return saved ? 'star' : 'star-border';
+  },
+
+  hasPreview(data) {
+    return !!data.preview;
+  },
+
+  openPreview() {
+    if (this.previewable) {
+      this.fire('open-preview', {data: this.data});
+    }
+  },
+
+  toggleFavorite(event) {
+    event.stopPropagation();
+    if (!this.saved) {
+      this.fire('save', {id: this.data.name, cb: () => {this.saved = true;}});
+    } else {
+      this.fire('delete', {id: this.data.name, cb: () => {this.saved = false;}});
+    }
   },
 });
 </script>

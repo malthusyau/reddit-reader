@@ -1,16 +1,23 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="rr-favorite-post.html">
 
 <dom-module id="rr-favorites-page">
   <template>
   <style>
   :host {
-    background-color: purple;
+    @apply(--fullbleed);
   }
   </style>
+  <template is="dom-repeat" items="[[favorites]]">
+    <rr-favorite-post post-id="[[item.$key]]"></rr-favorite-post>
+  </template>
 </template>
 <script>
 Polymer({
   is: 'rr-favorites-page',
+  properties: {
+    favorites: Array,
+  },
 });
 </script>
 </dom-module>

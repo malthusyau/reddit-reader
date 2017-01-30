@@ -36,6 +36,7 @@
     "paper-card": "polymerelements/paper-card#^1.1.4",
     "paper-spinner": "polymerelements/paper-spinner#^1.2.1",
     "iron-list": "polymerelements/iron-list#^1.4.0",
-    "iron-scroll-threshold": "polymerelements/iron-scroll-threshold#^1.0.3"
+    "iron-scroll-threshold": "polymerelements/iron-scroll-threshold#^1.0.3",
+    "paper-dialog": "polymerelements/paper-dialog#^1.1.0"
   }
 }

@@ -59,8 +59,21 @@ Polymer({
       },
     },
     nextPost: String,
+    url: {
+      type: String,
+      observer: 'urlChanged',
+    },
+  },
+  urlChanged() {
+    this.posts = [];
+    this.endIsReached = false;
+    this.nextPost = undefined;
+    this._loadMoreData();
   },
   _loadMoreData() {
+    if (!this.url || this.url.indexOf('https://') != 0 || this.endIsReached) {
+      return;
+    }
     this.$.ajax.params.count = this.posts.length;
     this.$.ajax.params.after = this.nextPost;
     this.$.ajax.generateRequest();
@@ -68,6 +81,9 @@ Polymer({
   onResponse(event) {
     var listings = event.detail.response.data.children;
     this.nextPost = event.detail.response.data.after;
+    if (this.nextPost === null) {
+      this.endIsReached = true;
+    }
     listings.forEach(post => {
       this.push('posts', post);
     });

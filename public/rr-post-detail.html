@@ -1,0 +1,87 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="bower_components/iron-image/iron-image.html">
+<link rel="import" href="bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="rr-post-detail">
+  <template>
+  <style include="iron-flex">
+  :host {
+    position: relative;
+    padding: 40px;
+  }
+
+  :host:hover .star {
+    display: block;
+  }
+
+  :host[saved] .star {
+    display: block;
+    color: #ffcb2c;
+  }
+
+  .star {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .source {
+    font-size: 12px;
+    color: #bbbbbb;
+  }
+
+  .title {
+    color: #2b2b2b;
+    text-decoration: none;
+  }
+
+  .title:visited {
+    color: #6b47ad;
+  }
+  </style>
+
+  <iron-image src="[[getPreviewImage(data)]]" loaded="{{loaded}}"></iron-image>
+  <div class="flex content">
+    <a href$="[[decodeHtml(data.url)]]" class="title" target="_blank">[[decodeHtml(data.title)]]</a>
+    <span class="source">([[data.domain]])</span>
+    <br>
+    <a href$="https://reddit.com[[data.permalink]]" class="comments">[[data.num_comments]] comments</a>
+  </div>
+  <paper-icon-button class="star" icon="[[getStarIcon(saved)]]"></paper-icon-button>
+</template>
+
+<script>
+Polymer({
+  is: 'rr-post-detail',
+
+  properties: {
+    data: {
+      type: Object,
+    },
+    saved: {
+      type: Boolean,
+      reflectToAttribute: true,
+      value: false,
+    },
+  },
+
+  decodeHtml(html) {
+    var txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  },
+
+  getPreviewImage(data) {
+    return this.decodeHtml(data.preview.images[0].source.url);
+  },
+
+  getStarIcon(saved) {
+    return saved ? 'star' : 'star-border';
+  },
+});
+</script>
+</dom-module>

@@ -13,12 +13,15 @@
 <link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="rr-hot-page.html">
 <link rel="import" href="rr-top-page.html">
 <link rel="import" href="rr-favorites-page.html">
 <link rel="import" href="rr-login-page.html">
+<link rel="import" href="rr-post-detail.html">
 
 <dom-module id="reddit-reader">
   <template>
@@ -42,10 +45,14 @@
     };
   }
   </style>
+
   <app-location route="{{route}}" use-hash-as-path></app-location>
   <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
   <firebase-auth app-name="redditReader" id="auth" user="{{user}}" provider="google" signed-in="{{signedIn}}">
   </firebase-auth>
+  <firebase-query app-name="redditReader" id="firebase" path="[[firebasePath]]" data="{{favorites}}" order-by-value></firebase-query>
+
   <app-toolbar>
     <div main-title>Reddit Reader App</div>
     <paper-tabs selected="{{routeData.view}}" attr-for-selected="tab">
@@ -76,8 +83,13 @@
     <rr-top-page></rr-top-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'favorites')]]">
-    <rr-favorites-page></rr-favorites-page>
+    <rr-favorites-page favorites="[[favorites]]"></rr-favorites-page>
   </template>
+
+  <paper-dialog id="modal" with-backdrop>
+    <rr-post-detail id="detailPost"></rr-post-detail>
+  </paper-dialog>
+
 </template>
 <script>
 Polymer({
@@ -88,9 +100,25 @@ Polymer({
       type: Boolean,
       observer: '_onSignedInChanged',
     },
+    favorites: Array,
+    firebasePath: {
+      type: String,
+      computed: 'getFirebasePath(user.uid)',
+    },
+    user: Object,
   },
 
   observers: ['_onPathChange(route.path)'],
+
+  listeners: {
+    'open-preview': 'openPreview',
+    'save': 'saveToFavorite',
+    'delete': 'removeFavorite',
+  },
+
+  getFirebasePath(id) {
+    return `users/${id}/favorites`;
+  },
 
   _previousPage: null,
 
@@ -143,6 +171,40 @@ Polymer({
 
   isRightPage(view, name) {
     return view === name;
+  },
+
+  openPreview(event) {
+    this.$.detailPost.data = event.detail.data;
+    this.$.modal.open();
+  },
+
+  saveToFavorite(event) {
+    if (!this.user) {
+      // Add user checks.
+    }
+    const key = event.detail.id;
+    const callback = event.detail.cb;
+    const date = -(new Date().valueOf());
+    const dbRef = this.$.firebase.db.ref(this.firebasePath);
+    dbRef.child(key).set(date)
+    .then(() => {
+      console.log('saved');
+      callback();
+    });
+  },
+
+  removeFavorite(event) {
+    if (!this.user) {
+      // Add user checks.
+    }
+    const key = event.detail.id;
+    const callback = event.detail.cb;
+    const dbRef = this.$.firebase.db.ref(this.firebasePath);
+    dbRef.child(key).remove()
+    .then(() => {
+      console.log('removed');
+      callback();
+    });
   },
 });
 </script>
