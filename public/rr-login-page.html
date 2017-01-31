@@ -1,20 +1,59 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-input/paper-input.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
 
 <dom-module id="rr-login-page">
   <template>
   <style>
+  paper-card {
+    max-width: 800px;
+    margin: 20px;
+  }
   </style>
-  <paper-button on-tap="signIn" disabled="[[disabled]]">
-    <iron-icon icon="account-circle"></iron-icon>
-    <span>Sign in or create account</span>
-  </paper-button>
+  <paper-card>
+    <div class="card-content">
+      <paper-input id="email" label="Email" required></paper-input>
+      <paper-input id="pw" label="Password" type="password" required></paper-input>
+      <div>[[message]]</div>
+    </div>
+    <div class="card-actions">
+      <paper-button on-tap="signUp">Sign Up</paper-button>
+      <paper-button on-tap="signIn">Sign In</paper-button>
+    </div>
+  </paper-card>
 </template>
 <script>
 Polymer({
   is: 'rr-login-page',
+  properties: {
+    message: String,
+  },
   signIn() {
-    this.fire('sign-in', null, { bubbles: false });
-  }
+    this.fire('sign-in', {
+      email: this.$.email.value,
+      pw: this.$.pw.value,
+      invalidCb: message => this.invalid(message),
+      successCb: () => this.success(),
+    }, {bubbles: false});
+  },
+  signUp() {
+    this.fire('sign-up', {
+      email: this.$.email.value,
+      pw: this.$.pw.value,
+      invalidCb: message => this.invalid(message),
+      successCb: () => this.success(),
+    }, {bubbles: false});
+  },
+  invalid(message) {
+    this.$.email.invalid = true;
+    this.$.pw.invalid = true;
+    this.message = message;
+  },
+  success() {
+    this.$.email.value = '';
+    this.$.pw.value = '';
+    this.message = '';
+  },
 });
 </script>
 </dom-module>

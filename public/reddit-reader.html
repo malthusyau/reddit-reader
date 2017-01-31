@@ -2,8 +2,6 @@
 <link rel="import" href="bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="bower_components/app-layout/app-header/app-header.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/app-route/app-location.html">
@@ -16,6 +14,7 @@
 <link rel="import" href="bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="rr-hot-page.html">
 <link rel="import" href="rr-top-page.html">
@@ -47,10 +46,9 @@
   </style>
 
   <app-location route="{{route}}" use-hash-as-path></app-location>
-  <app-route route="{{route}}" pattern="/:view" data="{{routeData}}" tail="{{subroute}}"></app-route>
+  <app-route route="{{route}}" pattern="/:view" data="{{routeData}}"></app-route>
 
-  <firebase-auth app-name="redditReader" id="auth" user="{{user}}" provider="google" signed-in="{{signedIn}}">
-  </firebase-auth>
+  <firebase-auth app-name="redditReader" id="auth" user="{{user}}" signed-in="{{signedIn}}"></firebase-auth>
   <firebase-query app-name="redditReader" id="firebase" path="[[firebasePath]]" data="{{favorites}}" order-by-value></firebase-query>
 
   <app-toolbar>
@@ -69,12 +67,18 @@
         Favorites
       </paper-tab>
     </paper-tabs>
-    <paper-button raised hidden="[[!signedIn]]" on-tap="signout">logout</paper-button>
-    <paper-button raised hidden="[[signedIn]]" on-tap="goToLogin">login</paper-button>
+    <paper-button hidden="[[!signedIn]]" on-tap="signout">
+      <iron-icon icon="account-circle"></iron-icon>
+      logout
+    </paper-button>
+    <paper-button hidden="[[signedIn]]" on-tap="goToLogin">
+      <iron-icon icon="account-circle"></iron-icon>
+      login
+    </paper-button>
   </app-toolbar>
 
   <template is="dom-if" if="[[isRightPage(routeData.view, 'login')]]">
-    <rr-login-page on-sign-in="login"></rr-login-page>
+    <rr-login-page on-sign-in="login" on-sign-up="signUp"></rr-login-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
     <rr-hot-page firebase-path="[[firebasePath]]"></rr-hot-page>
@@ -90,21 +94,26 @@
     <rr-post-detail id="detailPost"></rr-post-detail>
   </paper-dialog>
 
+  <paper-toast id="toast"></paper-toast>
 </template>
 <script>
 Polymer({
   is: 'reddit-reader',
 
   properties: {
+
     signedIn: {
       type: Boolean,
       observer: '_onSignedInChanged',
     },
+
     favorites: Array,
+
     firebasePath: {
       type: String,
       computed: 'getFirebasePath(user.uid)',
     },
+
     user: Object,
   },
 
@@ -116,6 +125,9 @@ Polymer({
   },
 
   getFirebasePath(id) {
+    if (!id) {
+      return null;
+    }
     return `users/${id}/favorites`;
   },
 
@@ -141,7 +153,7 @@ Polymer({
         }
       }
     } else {
-      this.navigateTo('/login');
+      this.navigateTo('/hot');
     }
   },
 
@@ -152,14 +164,27 @@ Polymer({
     }
   },
 
-  login() {
-    this.$.auth.signInWithPopup();
+  login(event) {
+    this.$.auth.signInWithEmailAndPassword(event.detail.email, event.detail.pw)
+    .then(() => event.detail.successCb())
+    .catch(error => {
+      event.detail.invalidCb(error.message);
+    });
+  },
+
+  signUp(event) {
+    this.$.auth.createUserWithEmailAndPassword(event.detail.email, event.detail.pw)
+    .then(() => event.detail.successCb())
+    .catch(error => {
+      event.detail.invalidCb(error.message);
+    });
   },
 
   signout() {
     this.$.auth.signOut();
   },
 
+  // Set the path with async to prevent circular change notifications.
   navigateTo(path) {
     this.async(() => {
       this.set('route.path', path);

@@ -127,6 +127,7 @@ Polymer({
    */
   queryReady(basePath, id) {
     if (!basePath || !id) {
+      this.saved = false;
       return;
     }
     const dbRef = this.$.firebase.db.ref(`${basePath}/${id}`);
