@@ -1,1 +1,5 @@
-{}
+{
+  "projects": {
+    "reddit-reader": "reddit-reader-c2935"
+  }
+}

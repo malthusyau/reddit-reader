@@ -1,16 +1,26 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="rr-favorite-post.html">
 
 <dom-module id="rr-favorites-page">
   <template>
-  <style>
+  <style include="iron-flex iron-flex-alignment">
   :host {
     @apply(--fullbleed);
   }
+
+  #container {
+    padding-top: 16px;
+    max-width: 800px;
+    margin: auto;
+    margin-bottom: 10px;
+  }
   </style>
-  <template is="dom-repeat" items="[[favorites]]">
-    <rr-favorite-post post-id="[[item.$key]]" firebase-path="[[firebasePath]]"></rr-favorite-post>
-  </template>
+  <div id="container" class="layout vertical flex center">
+    <template is="dom-repeat" items="[[favorites]]">
+      <rr-favorite-post post-id="[[item.$key]]" firebase-path="[[firebasePath]]"></rr-favorite-post>
+    </template>
+  </div>
 </template>
 <script>
 Polymer({

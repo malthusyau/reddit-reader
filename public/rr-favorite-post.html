@@ -6,6 +6,13 @@
 <dom-module id="rr-favorite-post">
   <template>
   <style>
+  :host {
+    display: block;
+    width: 100%;
+  }
+  rr-post {
+    width: 100%;
+  }
   </style>
   <iron-ajax url="[[getPostUrl(postId)]]">
   </iron-ajax>
