@@ -37,7 +37,7 @@
   <iron-scroll-threshold id="scrollThreshold" lower-threshold="500" on-lower-threshold="_loadMoreData">
     <iron-list id="list" items="[[posts]]" scroll-target="scrollThreshold">
       <template>
-        <rr-post data="[[item.data]]"></rr-post>
+        <rr-post data="[[item.data]]" firebase-path="[[firebasePath]]"></rr-post>
       </template>
     </iron-list>
 
@@ -51,6 +51,7 @@
 <script>
 Polymer({
   is: 'rr-stream',
+
   properties: {
     posts: {
       type: Array,
@@ -58,32 +59,26 @@ Polymer({
         return [];
       },
     },
+
     nextPost: String,
-    url: {
-      type: String,
-      observer: 'urlChanged',
-    },
+
+    url: String,
+
+    firebasePath: String,
   },
-  urlChanged() {
-    this.posts = [];
-    this.endIsReached = false;
-    this.nextPost = undefined;
-    this._loadMoreData();
-  },
+
   _loadMoreData() {
-    if (!this.url || this.url.indexOf('https://') != 0 || this.endIsReached) {
+    if (!this.url || this.url.indexOf('https://') != 0) {
       return;
     }
     this.$.ajax.params.count = this.posts.length;
     this.$.ajax.params.after = this.nextPost;
     this.$.ajax.generateRequest();
   },
+
   onResponse(event) {
     var listings = event.detail.response.data.children;
     this.nextPost = event.detail.response.data.after;
-    if (this.nextPost === null) {
-      this.endIsReached = true;
-    }
     listings.forEach(post => {
       this.push('posts', post);
     });

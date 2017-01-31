@@ -77,13 +77,13 @@
     <rr-login-page on-sign-in="login"></rr-login-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
-    <rr-hot-page></rr-hot-page>
+    <rr-hot-page firebase-path="[[firebasePath]]"></rr-hot-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'top')]]">
-    <rr-top-page></rr-top-page>
+    <rr-top-page firebase-path="[[firebasePath]]"></rr-top-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'favorites')]]">
-    <rr-favorites-page favorites="[[favorites]]"></rr-favorites-page>
+    <rr-favorites-page favorites="[[favorites]]" firebase-path="[[firebasePath]]"></rr-favorites-page>
   </template>
 
   <paper-dialog id="modal" with-backdrop>
@@ -112,8 +112,7 @@ Polymer({
 
   listeners: {
     'open-preview': 'openPreview',
-    'save': 'saveToFavorite',
-    'delete': 'removeFavorite',
+    'commit': 'commitFavorite',
   },
 
   getFirebasePath(id) {
@@ -154,13 +153,11 @@ Polymer({
   },
 
   login() {
-    this.$.auth.signInWithPopup().then(() => {
-    });
+    this.$.auth.signInWithPopup();
   },
 
   signout() {
-    this.$.auth.signOut().then(() => {
-    });
+    this.$.auth.signOut();
   },
 
   navigateTo(path) {
@@ -178,33 +175,34 @@ Polymer({
     this.$.modal.open();
   },
 
-  saveToFavorite(event) {
+  commitFavorite(event) {
     if (!this.user) {
-      // Add user checks.
+      this.$.toast.show('Please login to save to favorites');
+      return;
     }
     const key = event.detail.id;
-    const callback = event.detail.cb;
-    const date = -(new Date().valueOf());
+    const date = -(new Date().valueOf()); // Ugly hack to get the posts in reverse chronological order.
     const dbRef = this.$.firebase.db.ref(this.firebasePath);
-    dbRef.child(key).set(date)
-    .then(() => {
-      console.log('saved');
-      callback();
-    });
-  },
-
-  removeFavorite(event) {
-    if (!this.user) {
-      // Add user checks.
+    const save = event.detail.save;
+    if (save) {
+      dbRef.child(key).set(date)
+      .then(() => {
+        console.log('favorite saved!');
+      })
+      .catch(error => {
+        console.error('saving to favorites failed!');
+        console.error(error);
+      });
+    } else {
+      dbRef.child(key).remove()
+      .then(() => {
+        console.log('favorite removed.');
+      })
+      .catch(error => {
+        console.error('deleting favorite failed!');
+        console.error(error);
+      });
     }
-    const key = event.detail.id;
-    const callback = event.detail.cb;
-    const dbRef = this.$.firebase.db.ref(this.firebasePath);
-    dbRef.child(key).remove()
-    .then(() => {
-      console.log('removed');
-      callback();
-    });
   },
 });
 </script>

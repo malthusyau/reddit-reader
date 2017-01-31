@@ -9,7 +9,7 @@
   }
   </style>
   <template is="dom-repeat" items="[[favorites]]">
-    <rr-favorite-post post-id="[[item.$key]]"></rr-favorite-post>
+    <rr-favorite-post post-id="[[item.$key]]" firebase-path="[[firebasePath]]"></rr-favorite-post>
   </template>
 </template>
 <script>
@@ -17,6 +17,7 @@ Polymer({
   is: 'rr-favorites-page',
   properties: {
     favorites: Array,
+    firebasePath: String,
   },
 });
 </script>

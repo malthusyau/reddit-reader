@@ -3,6 +3,7 @@
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="bower_components/iron-image/iron-image.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="rr-post">
@@ -18,11 +19,11 @@
     position: relative;
   }
 
-  img {
+  .thumbnail {
     height: 120px;
   }
 
-  img:not([src^='http']) {
+  .thumbnail:not([src^='http']) {
     display: none;
   }
 
@@ -60,17 +61,35 @@
     color: #6b47ad;
   }
   </style>
+
+  <firebase-query id="firebase" app-name="redditReader"></firebase-query>
+
   <paper-card on-tap="openPreview">
     <div class="layout horizontal">
-      <img src="[[getThumbnail(data.thumbnail)]]"></img>
+      <img class="thumbnail" src="[[getThumbnail(data.thumbnail)]]"></img>
       <div class="flex content">
-        <a href$="[[decodeHtml(data.url)]]" class="title" target="_blank" onclick="event.stopPropagation();">[[decodeHtml(data.title)]]</a>
+        <a
+            href$="[[decodeHtml(data.url)]]"
+            class="title"
+            target="_blank"
+            onclick="event.stopPropagation();">
+          [[decodeHtml(data.title)]]
+        </a>
         <span class="source">([[data.domain]])</span>
         <br>
-        <a href$="https://reddit.com[[data.permalink]]" class="comments" onclick="event.stopPropagation();">[[data.num_comments]] comments</a>
+        <a
+            href$="https://reddit.com[[data.permalink]]"
+            class="comments"
+            onclick="event.stopPropagation();">
+          [[data.num_comments]] comments
+        </a>
       </div>
     </div>
-    <paper-icon-button class="star" icon="[[getStarIcon(saved)]]" on-tap="toggleFavorite"></paper-icon-button>
+    <paper-icon-button
+        class="star"
+        icon="[[getStarIcon(saved)]]"
+        on-tap="toggleFavorite">
+    </paper-icon-button>
   </paper-card>
 </template>
 <script>
@@ -78,17 +97,53 @@ Polymer({
   is: 'rr-post',
 
   properties: {
-    data: Object,
+
+    data: {
+      type: Object,
+      observer: 'dataChanged',
+    },
+
     saved: {
       type: Boolean,
       reflectToAttribute: true,
-      value: false,
     },
+
     previewable: {
       type: Boolean,
       reflectToAttribute: true,
       computed: 'hasPreview(data)',
     },
+
+    firebasePath: String,
+  },
+
+  observers: [
+    'queryReady(firebasePath, data.name)',
+  ],
+
+  /*
+   * When the basePath and id is set, listen to the post path for change in
+   * saved state.
+   */
+  queryReady(basePath, id) {
+    if (!basePath || !id) {
+      return;
+    }
+    const dbRef = this.$.firebase.db.ref(`${basePath}/${id}`);
+    dbRef.on('value', snapshot => {
+      this.saved = !!snapshot.val();
+    });
+  },
+
+  /*
+   * If the data was changed (happens when iron-list recycles the element),
+   * remove the old value listener.
+   */
+  dataChanged(newVal, oldVal) {
+    if (oldVal) {
+      const oldRef = this.$.firebase.db.ref(`${this.firebasePath}/${oldVal.name}`);
+      oldRef.off();
+    }
   },
 
   decodeHtml(html) {
@@ -99,7 +154,7 @@ Polymer({
 
   getThumbnail(url) {
     if (!!url && url.indexOf('http') === 0) {
-      return url;
+      return this.decodeHtml(url);
     }
     return '';
   },
@@ -119,12 +174,9 @@ Polymer({
   },
 
   toggleFavorite(event) {
+    // Prevent clicking of the button to open the modal.
     event.stopPropagation();
-    if (!this.saved) {
-      this.fire('save', {id: this.data.name, cb: () => {this.saved = true;}});
-    } else {
-      this.fire('delete', {id: this.data.name, cb: () => {this.saved = false;}});
-    }
+    this.fire('commit', {id: this.data.name, save: !this.saved});
   },
 });
 </script>

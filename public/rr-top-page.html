@@ -3,13 +3,14 @@
 
 <dom-module id="rr-top-page">
   <template>
-  <style>
-  </style>
-  <rr-stream url="https://www.reddit.com/top.json"></rr-stream>
-</template>
-<script>
-Polymer({
-  is: 'rr-top-page',
-});
-</script>
+    <rr-stream url="https://www.reddit.com/top.json" firebase-path="[[firebasePath]]"></rr-stream>
+  </template>
+  <script>
+  Polymer({
+    is: 'rr-top-page',
+    properties: {
+      firebasePath: String,
+    },
+  });
+  </script>
 </dom-module>

@@ -3,13 +3,14 @@
 
 <dom-module id="rr-hot-page">
   <template>
-  <style>
-  </style>
-  <rr-stream url="https://www.reddit.com/hot.json"></rr-stream>
-</template>
-<script>
-Polymer({
-  is: 'rr-hot-page',
-});
-</script>
+    <rr-stream url="https://www.reddit.com/hot.json" firebase-path="[[firebasePath]]"></rr-stream>
+  </template>
+  <script>
+  Polymer({
+    is: 'rr-hot-page',
+    properties: {
+      firebasePath: String,
+    },
+  });
+  </script>
 </dom-module>
