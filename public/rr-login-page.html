@@ -5,11 +5,22 @@
 <dom-module id="rr-login-page">
   <template>
   <style>
-  paper-card {
+  :host {
+    @apply(--fullbleed);
+    padding: 16px;
+  }
+
+  #container {
+    padding-top: 16px;
     max-width: 800px;
-    margin: 20px;
+    margin: auto;
+    margin-bottom: 10px;
+  }
+  paper-card {
+    width: 100%;
   }
   </style>
+  <div id="container">
   <paper-card>
     <div class="card-content">
       <paper-input id="email" label="Email" required></paper-input>

@@ -139,6 +139,7 @@ Polymer({
     }
     if (path === '/favorites' && !this.signedIn) {
       this.goToLogin();
+      this.$.toast.show('Please login to see favorites');
     }
   },
 
