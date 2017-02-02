@@ -1,10 +1,11 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
 <link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="rr-login-page">
   <template>
-  <style>
+  <style include="iron-flex">
   :host {
     @apply(--fullbleed);
     padding: 16px;
@@ -27,9 +28,11 @@
       <paper-input id="pw" label="Password" type="password" required></paper-input>
       <div>[[message]]</div>
     </div>
-    <div class="card-actions">
+    <div class="card-actions layout horizontal">
       <paper-button on-tap="signUp">Sign Up</paper-button>
+      <div class="flex"></div>
       <paper-button on-tap="signIn">Sign In</paper-button>
+      <paper-button on-tap="resetPw">Forgot Password</paper-button>
     </div>
   </paper-card>
 </template>
@@ -39,31 +42,48 @@ Polymer({
   properties: {
     message: String,
   },
-  signIn() {
-    this.fire('sign-in', {
-      email: this.$.email.value,
-      pw: this.$.pw.value,
-      invalidCb: message => this.invalid(message),
-      successCb: () => this.success(),
-    }, {bubbles: false});
-  },
+
   signUp() {
-    this.fire('sign-up', {
+    this.authenticate('sign-up');
+  },
+
+  signIn() {
+    this.authenticate('sign-in');
+  },
+
+  resetPw() {
+    this.authenticate('reset-pw');
+  },
+
+  authenticate(type) {
+    let successMessage;
+    if (type == 'reset-pw') {
+      successMessage = 'An email to reset your password has been sent';
+      if (!this.$.email.validate()) {
+        this.message = 'Please type in your email to reset password'
+      }
+    } else if (!this.$.email.validate() || !this.$.pw.validate()) {
+      this.message = 'Email and password cannot be empty';
+    }
+    this.fire('authenticate', {
+      type,
       email: this.$.email.value,
       pw: this.$.pw.value,
       invalidCb: message => this.invalid(message),
-      successCb: () => this.success(),
+      successCb: () => this.success(successMessage),
     }, {bubbles: false});
   },
+
   invalid(message) {
     this.$.email.invalid = true;
     this.$.pw.invalid = true;
     this.message = message;
   },
-  success() {
+
+  success(message) {
     this.$.email.value = '';
     this.$.pw.value = '';
-    this.message = '';
+    this.message = message || '';
   },
 });
 </script>

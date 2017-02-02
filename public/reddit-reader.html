@@ -78,7 +78,7 @@
   </app-toolbar>
 
   <template is="dom-if" if="[[isRightPage(routeData.view, 'login')]]">
-    <rr-login-page on-sign-in="login" on-sign-up="signUp"></rr-login-page>
+    <rr-login-page on-authenticate="authenticate"></rr-login-page>
   </template>
   <template is="dom-if" if="[[isRightPage(routeData.view, 'hot')]]">
     <rr-hot-page firebase-path="[[firebasePath]]"></rr-hot-page>
@@ -165,16 +165,23 @@ Polymer({
     }
   },
 
-  login(event) {
-    this.$.auth.signInWithEmailAndPassword(event.detail.email, event.detail.pw)
-    .then(() => event.detail.successCb())
-    .catch(error => {
-      event.detail.invalidCb(error.message);
-    });
-  },
-
-  signUp(event) {
-    this.$.auth.createUserWithEmailAndPassword(event.detail.email, event.detail.pw)
+  authenticate(event) {
+    let promise;
+    const auth = this.$.auth;
+    const email = event.detail.email;
+    const pw = event.detail.pw;
+    switch (event.detail.type) {
+      case 'sign-in':
+        promise = auth.signInWithEmailAndPassword(email, pw);
+        break;
+      case 'sign-up':
+        promise = auth.createUserWithEmailAndPassword(email, pw);
+        break;
+      case 'reset-pw':
+        promise = auth.auth.sendPasswordResetEmail(email);
+        break;
+    }
+    promise
     .then(() => event.detail.successCb())
     .catch(error => {
       event.detail.invalidCb(error.message);
